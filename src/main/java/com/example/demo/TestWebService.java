@@ -5,8 +5,6 @@ import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
 
 import javax.xml.rpc.ParameterMode;
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
 
 /**
  * 测试WebService调用
@@ -19,22 +17,29 @@ public class TestWebService {
     public static void main(String[] args) {
         try {
             String endpoint = "http://cloud.qazhis.cn:8088/QAZ/services/ICommonMobileAPIService";
+
             Service service = new Service();
-            Call call = (Call)service.createCall();
+            Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
-            call.setOperation("KYBusiness");
 
-            call.addParameter("KeyCode", XMLType.XSD_STRING, ParameterMode.IN);
-            call.addParameter("TranCode", XMLType.XSD_STRING, ParameterMode.IN);
-            call.addParameter("IDCardNo", XMLType.XSD_STRING, ParameterMode.IN);
-
+            // 方法名
+            call.setOperationName("KYBusiness");
+            // 参数名，参照 WSDL 返回的描述
+            call.addParameter("in0", XMLType.XSD_STRING, ParameterMode.IN);
+            // 返回值类型
             call.setReturnType(XMLType.XSD_STRING);
+            // 参数值
+            Object[] paramValues = new Object[] {"<Request>\n" +
+                    "    <KeyCode>gxmQZQskCZX+GR9DIm2xR4Jd2GtpDUFn</KeyCode>\n" +
+                    "<TranCode>0002</TranCode>\n" +
+                    "<IDCardNo>110101198003076435</IDCardNo>\n" +
+                    "</Request>"};
 
-            String result = (String)call.invoke(new Object[]{"gxmQZQskCZX+GR9DIm2xR4Jd2GtpDUFn", "0002", "110101198003076435"});
+            // 给方法传递参数，并且调用方法
+            String result = (String) call.invoke(paramValues);
 
             System.out.println("result is " + result);
-
-        } catch (ServiceException | RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
